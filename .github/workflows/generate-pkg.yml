@@ -1,0 +1,45 @@
+name: generate-pkg
+on:
+  push:
+    branches:
+      - main
+  schedule:
+  - cron: '0 0 * * 0,3'
+  workflow_dispatch:
+  
+jobs:
+  build-soh-pkg:
+    runs-on: ubuntu-latest
+    name: Build Soh Arch package
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build package
+      uses: Alto1772/arch-pkgbuild-builder@5e7bc60d48104de97f9138e43b1078a5fb1821ea
+      with:
+        target: pkgbuild
+        pkgname: soh/
+    - name: Upload package
+      uses: actions/upload-artifact@v3
+      with:
+        name: soh
+        path: |
+          soh/soh-*.pkg.tar.zst
+          soh/soh-otr-exporter-*.pkg.tar.zst
+        
+  build-soh-git-pkg:
+    runs-on: ubuntu-latest
+    name: Build Soh Arch package (Git)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build package
+      uses: Alto1772/arch-pkgbuild-builder@5e7bc60d48104de97f9138e43b1078a5fb1821ea
+      with:
+        target: pkgbuild
+        pkgname: soh-git/
+    - name: Upload package
+      uses: actions/upload-artifact@v3
+      with:
+        name: soh-git
+        path: |
+          soh-git/soh-git-*.pkg.tar.zst
+          soh-git/soh-otr-exporter-git-*.pkg.tar.zst
