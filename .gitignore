@@ -1,0 +1,11 @@
+pkg/
+src/
+
+*.zst
+*.log
+*.xz
+*.gz
+*.bz2
+*.[zZvVnN]64
+
+!/*/assets-headers-*.tar.xz
