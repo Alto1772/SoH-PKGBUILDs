@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build package
-      uses: Alto1772/arch-pkgbuild-builder@5e7bc60d48104de97f9138e43b1078a5fb1821ea
+      uses: Alto1772/arch-pkgbuild-builder@94308635315e36ccdde50ddc2327e244419590da
       with:
         target: pkgbuild
         pkgname: soh/
@@ -32,7 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build package
-      uses: Alto1772/arch-pkgbuild-builder@5e7bc60d48104de97f9138e43b1078a5fb1821ea
+      uses: Alto1772/arch-pkgbuild-builder@94308635315e36ccdde50ddc2327e244419590da
       with:
         target: pkgbuild
         pkgname: soh-git/
