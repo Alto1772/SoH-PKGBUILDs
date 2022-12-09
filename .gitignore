@@ -1,11 +1,26 @@
-pkg/
+/*/*/
+.chroot/
+.repo/*/
+!.cache/urlwatch.db
 src/
-
-*.zst
+pkg/
+*.tgz
+*.tar.gz
+*.zip
 *.log
-*.xz
-*.gz
+*.gem
+*.jar
+*.tar.xz
 *.bz2
+*.tar.xz.sig
+*.asc
+*.sig
+*.7z
+*.xz
+*.lz
+*.sign
+*.zst
 *.[zZvVnN]64
 
-!/*/assets-headers-*.tar.xz
+# Ignore pregenerated headers
+!assets-headers-*.tar.xz
