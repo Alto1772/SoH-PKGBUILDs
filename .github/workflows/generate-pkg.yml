@@ -57,16 +57,44 @@ jobs:
       uses: actions/download-artifact@v3.0.1
       with:
         name: soh
+        path: pkgs
     - name: Install built soh package
-      run: sudo pacman -U --noconfirm soh-otr-exporter-*.tar.zst
+      run: sudo pacman -U --noconfirm pkgs/soh-otr-exporter-*.tar.zst
     - name: Build OTR packages
       run: |
-        for d in soh-otr-*; do
+        for d in soh-otr-*/; do
           cp "~/roms/oot-${d#soh-otr-}.z64" "$d"
           ( cd $d; makepkg --syncdeps --noconfirm; )
         done
     - name: Remove soh package
       run: sudo pacman -R --noconfirm soh-otr-exporter
-    - name: Publish OTR packages
-      run: cp soh-otr-*/*.tar.zst /output
-
+    - name: Publish Main + OTR packages
+      run: |
+        cp soh-otr-*/*.tar.zst /output
+        cp pkgs/*.tar.zst /output
+  
+  build-soh-otrs-git:
+    needs: build-soh-git-pkg
+    runs-on: [ self-hosted, asset-builder ]
+    name: Build & Publish OTR packages (git) (private use)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Download built soh-git package
+      uses: actions/download-artifact@v3.0.1
+      with:
+        name: soh-git
+        path: pkgs
+    - name: Install built soh-git package
+      run: sudo pacman -U --noconfirm pkgs/soh-otr-exporter-git-*.tar.zst
+    - name: Build OTR packages
+      run: |
+        for d in soh-otr-*/; do
+          cp "~/roms/oot-${d#soh-otr-}.z64" "$d"
+          ( cd $d; makepkg --syncdeps --noconfirm; )
+        done
+    - name: Remove soh-git package
+      run: sudo pacman -R --noconfirm soh-otr-exporter-git
+    - name: Publish Main + OTR packages
+      run: |
+        cp soh-otr-*/*.tar.zst /output
+        cp pkgs/*.tar.zst /output
