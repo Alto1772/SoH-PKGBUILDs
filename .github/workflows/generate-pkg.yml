@@ -63,7 +63,7 @@ jobs:
     - name: Build OTR packages
       run: |
         for d in soh-otr-*; do
-          cp "/roms/oot-${d#soh-otr-}.z64" "$d"
+          cp "/roms/oot-${d#soh-otr-}.z64" "$d/baserom.z64"
           ( cd $d; makepkg --syncdeps --noconfirm; )
         done
     - name: Remove soh package
@@ -89,7 +89,7 @@ jobs:
     - name: Build OTR packages
       run: |
         for d in soh-otr-*; do
-          cp "/roms/oot-${d#soh-otr-}.z64" "$d"
+          cp "/roms/oot-${d#soh-otr-}.z64" "$d/baserom.z64"
           ( cd $d; makepkg --syncdeps --noconfirm; )
         done
     - name: Remove soh-git package
