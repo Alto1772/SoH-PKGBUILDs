@@ -1,8 +1,8 @@
 name: generate-pkg
 on:
   push:
-    branches:
-      - main
+    #branches:
+    #  - main
   schedule:
   - cron: '0 0 * * 0,3'
   workflow_dispatch:
@@ -43,3 +43,30 @@ jobs:
         path: |
           soh-git/soh-git-*.pkg.tar.zst
           soh-git/soh-otr-exporter-git-*.pkg.tar.zst
+  
+  # Requires Arch Linux distro with a user that has no password
+  # input ROMs is at ~/roms, and outputs at /output
+  build-soh-otrs:
+    needs: build-soh-pkg
+    runs-on: [ self-hosted, asset-builder ]
+    name: Build & Publish OTR packages (private use)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Download built soh package
+      uses: actions/download-artifact@v3.0.1
+      with:
+        name: soh
+    - name: Install built soh package
+      run: |
+        unzip -o soh.zip
+        sudo pacman -U --noconfirm soh-otr-exporter-*.tar.zst
+    - name: Build OTR packages
+      run: |
+        for d in soh-otr-*; do
+          ( cd $d; makepkg --syncdeps --noconfirm; )
+        done
+    - name: Remove soh package
+      run: sudo pacman -R --noconfirm soh-otr-exporter
+    - name: Publish OTR packages
+      run: cp soh-otr-*/*.tar.zst /output
+
