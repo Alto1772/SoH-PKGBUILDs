@@ -58,9 +58,7 @@ jobs:
       with:
         name: soh
     - name: Install built soh package
-      run: |
-        unzip -o soh.zip
-        sudo pacman -U --noconfirm soh-otr-exporter-*.tar.zst
+      run: sudo pacman -U --noconfirm soh-otr-exporter-*.tar.zst
     - name: Build OTR packages
       run: |
         for d in soh-otr-*; do
