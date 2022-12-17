@@ -62,7 +62,7 @@ jobs:
       run: sudo pacman -U --noconfirm pkgs/soh-otr-exporter-*.tar.zst
     - name: Build OTR packages
       run: |
-        for d in soh-otr-*/; do
+        for d in soh-otr-*; do
           cp "~/roms/oot-${d#soh-otr-}.z64" "$d"
           ( cd $d; makepkg --syncdeps --noconfirm; )
         done
@@ -88,7 +88,7 @@ jobs:
       run: sudo pacman -U --noconfirm pkgs/soh-otr-exporter-git-*.tar.zst
     - name: Build OTR packages
       run: |
-        for d in soh-otr-*/; do
+        for d in soh-otr-*; do
           cp "~/roms/oot-${d#soh-otr-}.z64" "$d"
           ( cd $d; makepkg --syncdeps --noconfirm; )
         done
