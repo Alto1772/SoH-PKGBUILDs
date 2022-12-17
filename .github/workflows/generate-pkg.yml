@@ -45,8 +45,8 @@ jobs:
           soh-git/soh-otr-exporter-git-*.pkg.tar.zst
   
   # Requires Arch Linux distro with a user that has no password
-  # input rom dirs is at ~/roms, and outputs at /output
-  # for roms, rename them as oot-<VERSION_XML>.z64 just like its otr pkgs
+  # put roms at /roms, then rename them as oot-<VERSION_XML>.z64 
+  # just like its otr pkgs. Outputs pkgs at /output
   build-soh-otrs:
     needs: build-soh-pkg
     runs-on: [ self-hosted, asset-builder ]
@@ -63,7 +63,7 @@ jobs:
     - name: Build OTR packages
       run: |
         for d in soh-otr-*; do
-          cp "~/roms/oot-${d#soh-otr-}.z64" "$d"
+          cp "/roms/oot-${d#soh-otr-}.z64" "$d"
           ( cd $d; makepkg --syncdeps --noconfirm; )
         done
     - name: Remove soh package
@@ -89,7 +89,7 @@ jobs:
     - name: Build OTR packages
       run: |
         for d in soh-otr-*; do
-          cp "~/roms/oot-${d#soh-otr-}.z64" "$d"
+          cp "/roms/oot-${d#soh-otr-}.z64" "$d"
           ( cd $d; makepkg --syncdeps --noconfirm; )
         done
     - name: Remove soh-git package
