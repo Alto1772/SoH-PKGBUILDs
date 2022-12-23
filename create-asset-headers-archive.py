@@ -4,7 +4,9 @@ from glob import glob, iglob
 from itertools import chain, product
 from functools import partial
 import os
+import sys
 import re
+import tarfile
 
 def get_includes(header_list, src_file, *, prefix=""):
     includes = []
@@ -21,8 +23,21 @@ def get_includes(header_list, src_file, *, prefix=""):
             except IndexError: pass
     return src_file, includes
 
+def create_tarfile(tarpath, files):
 
-if __name__ == '__main__':
+    def append_soh_into_path(infoobj):
+        infoobj.name = "soh/" + infoobj.name
+        return infoobj
+
+    # add .xz at the end if there's none
+    tarpath = tarpath.removesuffix(".xz") + ".xz"
+    tar = tarfile.open(tarpath, "w:xz")
+    for p in files:
+        tar.add(p, filter=append_soh_into_path)
+    tar.close()
+
+def main():
+    asset_tar_file = sys.argv[1]
     asset_folder = "assets"
     file_folders = ["soh", "src"]
     file_extensions = ['c', 'cpp', 'h', 'hpp']
@@ -38,6 +53,7 @@ if __name__ == '__main__':
     included_srcfiles = dict(filter(lambda l: len(l[1]), included_srcfiles))
 
     included_headers = set(h for f in included_srcfiles.values() for h in f)
-    for hdr in asset_headers:
-        if hdr not in included_headers:
-            os.remove(hdr)
+    create_tarfile(asset_tar_file, included_headers)
+
+if __name__ == '__main__':
+    main()
