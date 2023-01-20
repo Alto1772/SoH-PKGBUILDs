@@ -1,8 +1,5 @@
 name: generate-pkg
 on:
-  push:
-    #branches:
-    #  - main
   schedule:
   - cron: '0 0 * * 0,1,3,5'
   workflow_dispatch:
@@ -43,6 +40,24 @@ jobs:
         path: |
           soh-git/soh-git-*.pkg.tar.zst
           soh-git/soh-otr-exporter-git-*.pkg.tar.zst
+  
+  build-soh-bradley-git-pkg:
+    runs-on: ubuntu-latest
+    name: Build Soh Arch package (Bradley Git branch)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build package
+      uses: Alto1772/arch-pkgbuild-builder@94308635315e36ccdde50ddc2327e244419590da
+      with:
+        target: pkgbuild
+        pkgname: soh-bradley-git/
+    - name: Upload package
+      uses: actions/upload-artifact@v3
+      with:
+        name: soh-bradley-git
+        path: |
+          soh-bradley-git/soh-bradley-git-*.pkg.tar.zst
+          soh-bradley-git/soh-otr-exporter-bradley-git-*.pkg.tar.zst
   
   # Requires Arch Linux distro with a user that has no password
   # put roms at /roms, then rename them as oot-<VERSION_XML>.z64 
@@ -94,6 +109,32 @@ jobs:
         done
     - name: Remove soh-git package
       run: sudo pacman -R --noconfirm soh-otr-exporter-git
+    - name: Publish Main + OTR packages
+      run: |
+        cp soh-otr-*/*.tar.zst /output
+        cp pkgs/*.tar.zst /output
+
+  build-soh-otrs-bradley-git:
+    needs: build-soh-bradley-git-pkg
+    runs-on: [ self-hosted, asset-builder ]
+    name: Build & Publish OTR packages (Bradley Git branch) (private use)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Download built soh-git package
+      uses: actions/download-artifact@v3.0.1
+      with:
+        name: soh-bradley-git
+        path: pkgs
+    - name: Install built soh-bradley-git package
+      run: sudo pacman -U --noconfirm pkgs/soh-otr-exporter-bradley-git-*.tar.zst
+    - name: Build OTR packages
+      run: |
+        for d in soh-otr-*; do
+          cp "/roms/oot-${d#soh-otr-}.z64" "$d/baserom.z64"
+          ( cd $d; makepkg --syncdeps --noconfirm; )
+        done
+    - name: Remove soh-git package
+      run: sudo pacman -R --noconfirm soh-otr-exporter-bradley-git
     - name: Publish Main + OTR packages
       run: |
         cp soh-otr-*/*.tar.zst /output
