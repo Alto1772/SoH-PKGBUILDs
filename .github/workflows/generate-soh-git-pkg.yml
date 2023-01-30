@@ -2,7 +2,7 @@ name: generate-soh-git-pkg
 on:
   push:
     paths:
-    - soh-git/
+    - soh-git/**
   schedule:
   - cron: '0 0 * * 0,1,3,5'
   workflow_dispatch:
