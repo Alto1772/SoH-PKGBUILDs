@@ -1,31 +1,13 @@
-name: generate-pkg
+name: generate-soh-git-pkg
 on:
   push:
-    #branches:
-    #  - main
+    paths:
+    - soh-git/
   schedule:
   - cron: '0 0 * * 0,1,3,5'
   workflow_dispatch:
   
 jobs:
-  build-soh-pkg:
-    runs-on: ubuntu-latest
-    name: Build Soh Arch package
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build package
-      uses: Alto1772/arch-pkgbuild-builder@94308635315e36ccdde50ddc2327e244419590da
-      with:
-        target: pkgbuild
-        pkgname: soh/
-    - name: Upload package
-      uses: actions/upload-artifact@v3
-      with:
-        name: soh
-        path: |
-          soh/soh-*.pkg.tar.zst
-          soh/soh-otr-exporter-*.pkg.tar.zst
-        
   build-soh-git-pkg:
     runs-on: ubuntu-latest
     name: Build Soh Arch package (Git)
@@ -47,32 +29,6 @@ jobs:
   # Requires Arch Linux distro with a user that has no password
   # put roms at /roms, then rename them as oot-<VERSION_XML>.z64 
   # just like its otr pkgs. Outputs pkgs at /output
-  build-soh-otrs:
-    needs: build-soh-pkg
-    runs-on: [ self-hosted, asset-builder ]
-    name: Build & Publish OTR packages (private use)
-    steps:
-    - uses: actions/checkout@v3
-    - name: Download built soh package
-      uses: actions/download-artifact@v3.0.1
-      with:
-        name: soh
-        path: pkgs
-    - name: Install built soh package
-      run: sudo pacman -U --noconfirm pkgs/soh-otr-exporter-*.tar.zst
-    - name: Build OTR packages
-      run: |
-        for d in soh-otr-*; do
-          cp "/roms/oot-${d#soh-otr-}.z64" "$d/baserom.z64"
-          ( cd $d; makepkg --syncdeps --noconfirm; )
-        done
-    - name: Remove soh package
-      run: sudo pacman -R --noconfirm soh-otr-exporter
-    - name: Publish Main + OTR packages
-      run: |
-        cp soh-otr-*/*.tar.zst /output
-        cp pkgs/*.tar.zst /output
-  
   build-soh-otrs-git:
     needs: build-soh-git-pkg
     runs-on: [ self-hosted, asset-builder ]
