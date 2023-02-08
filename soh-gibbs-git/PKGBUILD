@@ -1,10 +1,10 @@
 # Maintainer: AltoXorg <atrl101 AT yahoo DOT com>
 
 _reponame=Shipwright
-_branch=develop-bradley
-pkgbase=soh-bradley-git
-pkgname=(soh-bradley-git soh-otr-exporter-bradley-git)
-pkgver=5.1.3.develop.bradley.r22.g750ae907c
+_branch=develop-gibbs
+pkgbase=soh-gibbs-git
+pkgname=(soh-gibbs-git soh-otr-exporter-gibbs-git)
+pkgver=6.0.0.develop.gibbs.r0.g242a35c3a
 pkgrel=1
 arch=("x86_64" "i686")
 url="https://shipofharkinian.com/"
@@ -23,7 +23,7 @@ sha256sums=('SKIP'
             'SKIP'
             'd93dbc5273eb6ab88aa4d99869a6ba7fce495253a953af269c28ec72c0b00eb6'
             'a7116d348afda424e3bcabda4a5cd4d6473039494bfe8ef1d81909f86ff0b72d'
-            'cddea52031c2e9638a066a59746ecb4d9a0c3fb2a7e5858ccaf2441e8f3901ab'
+            '3de25d94d28f58daec33539181a8a666a20545204089996acf485325124ff9bc'
             '6e735877e7bba81f9f308f6eabbdfe5354f2c331a9acf9a16ab02a5681f2c25f'
             '3e9090d6e64929383290264822ee29313d028606fad1a14900623241159d3fd7')
 noextract=("assets-headers-gc_nmq_pal_f.tar.xz")
@@ -97,8 +97,8 @@ build() {
   cmake --build build --target OTRGui --config $BUILD_TYPE
 }
 
-package_soh-bradley-git() {
-  pkgdesc="A port of The Legend of Zelda Ocarina of Time for PC, Wii U, and Switch (develop-bradley git branch)"
+package_soh-gibbs-git() {
+  pkgdesc="A port of The Legend of Zelda Ocarina of Time for PC, Wii U, and Switch (develop-gibbs git branch)"
   provides=("soh")
   conflicts=("soh")
   depends=("${_depends_soh[@]}")
@@ -117,8 +117,8 @@ package_soh-bradley-git() {
   install -Dm644 soh/macosx/sohIcon.png "${pkgdir}/usr/share/pixmaps/soh.png"
 }
 
-package_soh-otr-exporter-bradley-git() {
-  pkgdesc="OTR generation tools for SoH, including asset XML files and a simple GUI tool (develop-bradley git branch)"
+package_soh-otr-exporter-gibbs-git() {
+  pkgdesc="OTR generation tools for SoH, including asset XML files and a simple GUI tool (develop-gibbs git branch)"
   provides=("soh-otr-exporter")
   conflicts=("soh-otr-exporter")
   license=("MIT")
