@@ -21,6 +21,7 @@ pkg/
 *.sign
 *.zst
 *.[zZvVnN]64
+*.otr
 
 # Ignore pregenerated headers
 !assets-headers-*.tar.xz
