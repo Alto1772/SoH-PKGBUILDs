@@ -22,6 +22,7 @@ pkg/
 *.zst
 *.[zZvVnN]64
 *.otr
+*.patch
 
 # Ignore pregenerated headers
 !assets-headers-*.tar.xz
