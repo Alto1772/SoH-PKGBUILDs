@@ -1,4 +1,4 @@
-run-name: Build Development Packages
+name: Build Development Packages
 on:
   push:
     branches: [ main ]
@@ -33,7 +33,7 @@ jobs:
           # Make output JSON so it can be used as a matrix. [page:3]
           json: "true"
           escape_json: "false"
-          files: *-git/**
+          files: '*-git/**'
 
       # On manual: enumerate all root dirs
       - name: All root dirs (manual only)
