@@ -2,8 +2,10 @@ name: Build Release Packages
 on:
   push:
     branches: [ main ]
-  #schedule:
-  #- cron: 0 0 * * 0,3
+    paths-ignore:
+    - .github/**
+    - *-git/**
+    - *-otr-*/**
   workflow_dispatch:
 
 jobs:
