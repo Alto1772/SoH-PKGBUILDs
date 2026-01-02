@@ -1,0 +1,64 @@
+name: Build Release Packages
+on:
+  push:
+    branches: [ main ]
+  #schedule:
+  #- cron: 0 0 * * 0,3
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.set-matrix.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # needed for reliable diffs on push
+
+      - name: Changed packages
+        id: changed
+        if: github.event_name == 'push'
+        uses: tj-actions/changed-files@v47
+        with:
+          fetch_depth: 0
+          dir_names: "true"
+          dir_names_exclude_current_dir: "true"
+          dir_names_max_depth: "1"
+          files_ignore: |
+            *-git/**
+            *-otr-*/**
+
+      - name: Build matrix JSON
+        id: set-matrix
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" != "push" ]]; then
+            # Manual run: include all root-level subdirs
+            mapfile -t dirs < <(find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
+          else
+            # Push: include only changed root-level dirs
+            # changed-files outputs a whitespace-separated list of dirs
+            read -r -a dirs <<< "${{ steps.changed.outputs.all_changed_files }}"
+          fi
+
+          echo "dirs=$(printf '%s\n' "${dirs[@]}" | jq -R . | jq -cs '{dir: .}')" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover.outputs.dirs) }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build package
+        uses: Alto1772/arch-pkgbuild-builder@94308635315e36ccdde50ddc2327e244419590da
+        with:
+          target: pkgbuild
+          pkgname: ${{ matrix.dir }}
+      - name: Upload package
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.dir }}
+          path: ${{ matrix.dir }}/*.pkg.tar.zst
