@@ -43,7 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           dirs="$(
-            find . -mindepth 1 -maxdepth 1 -type d
+            find . -mindepth 1 -maxdepth 1 -type d \
               -path ./*-git \
               -printf '%f\n' | sort -u \
             | jq -Rsc 'split("\n") | map(select(length>0))'
