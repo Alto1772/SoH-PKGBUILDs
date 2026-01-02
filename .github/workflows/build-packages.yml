@@ -10,7 +10,7 @@ jobs:
   discover:
     runs-on: ubuntu-latest
     outputs:
-      dirs: ${{ steps.set-matrix.outputs.dirs }}
+      matrix: ${{ steps.mk.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
         with:
