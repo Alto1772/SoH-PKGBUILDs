@@ -1,4 +1,4 @@
-name: "Build Development (*-git) Packages"
+name: Build Development Packages
 on:
   push:
     branches: [ main ]
