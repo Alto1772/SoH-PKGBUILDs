@@ -1,7 +1,9 @@
-name: Build Development Packages
+run-name: Build Development Packages
 on:
   push:
     branches: [ main ]
+    paths:
+    - '*-git/**'
   schedule:
   - cron: 0 0 * * 0,3
   workflow_dispatch:
