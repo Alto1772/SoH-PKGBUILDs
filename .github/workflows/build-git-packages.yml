@@ -1,0 +1,81 @@
+name: Build Development (*-git) Packages
+on:
+  push:
+    branches: [ main ]
+  schedule:
+  - cron: 0 0 * * 0,3
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.mk.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # needed for reliable diffs on push
+
+      # On push: compute changed root dirs
+      - name: Changed root dirs (push only)
+        id: changed
+        if: github.event_name == 'push'
+        uses: tj-actions/changed-files@v47
+        with:
+          # Return directories instead of files. [page:3]
+          dir_names: "true"
+          # Only consider actual root subdirs by limiting depth to 1 (e.g. "apps/foo" -> "apps"). [page:3]
+          dir_names_max_depth: "1"
+          # Exclude '.' which means "repo root" when root files changed. [page:3]
+          dir_names_exclude_current_dir: "true"
+          # Make output JSON so it can be used as a matrix. [page:3]
+          json: "true"
+          escape_json: "false"
+          files: *-git/**
+
+      # On manual: enumerate all root dirs
+      - name: All root dirs (manual only)
+        id: all
+        if: github.event_name != 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          dirs="$(
+            find . -mindepth 1 -maxdepth 1 -type d
+              -path ./*-git \
+              -printf '%f\n' | sort -u \
+            | jq -Rsc 'split("\n") | map(select(length>0))'
+          )"
+          echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
+
+      - name: Build matrix
+        id: mk
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # tj-actions outputs JSON array (because json=true, escape_json=false).
+            dirs='${{ steps.changed.outputs.all_changed_files }}'
+          else
+            dirs='${{ steps.all.outputs.dirs }}'
+          fi
+          echo "matrix=$(jq -nc --argjson d "$dirs" '{dir: $d}')" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build package
+        uses: Alto1772/arch-pkgbuild-builder@94308635315e36ccdde50ddc2327e244419590da
+        with:
+          target: pkgbuild
+          pkgname: ${{ matrix.dir }}
+      - name: Upload package
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.dir }}
+          path: ${{ matrix.dir }}/*.pkg.tar.zst
