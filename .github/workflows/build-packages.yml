@@ -16,40 +16,61 @@ jobs:
         with:
           fetch-depth: 0 # needed for reliable diffs on push
 
-      - name: Changed packages
+      # On push: compute changed root dirs
+      - name: Changed root dirs (push only)
         id: changed
         if: github.event_name == 'push'
         uses: tj-actions/changed-files@v47
         with:
-          fetch_depth: 0
+          # Return directories instead of files. [page:3]
           dir_names: "true"
-          dir_names_exclude_current_dir: "true"
+          # Only consider actual root subdirs by limiting depth to 1 (e.g. "apps/foo" -> "apps"). [page:3]
           dir_names_max_depth: "1"
+          # Exclude '.' which means "repo root" when root files changed. [page:3]
+          dir_names_exclude_current_dir: "true"
+          # Make output JSON so it can be used as a matrix. [page:3]
+          json: "true"
+          escape_json: "false"
           files_ignore: |
+            .github/**
             *-git/**
             *-otr-*/**
 
-      - name: Build matrix JSON
-        id: set-matrix
+      # On manual: enumerate all root dirs
+      - name: All root dirs (manual only)
+        id: all
+        if: github.event_name != 'push'
         shell: bash
         run: |
-          if [[ "${{ github.event_name }}" != "push" ]]; then
-            # Manual run: include all root-level subdirs
-            mapfile -t dirs < <(find . -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)
-          else
-            # Push: include only changed root-level dirs
-            # changed-files outputs a whitespace-separated list of dirs
-            read -r -a dirs <<< "${{ steps.changed.outputs.all_changed_files }}"
-          fi
+          set -euo pipefail
+          dirs="$(
+            find . -mindepth 1 -maxdepth 1 -type d \
+              -not -path './.git' -not -path './.github' \
+              -not -path './*-git' -not -path './*-otr-*' \
+              -printf '%f\n' | sort -u \
+            | jq -Rsc 'split("\n") | map(select(length>0))'
+          )"
+          echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
 
-          echo "dirs=$(printf '%s\n' "${dirs[@]}" | jq -R . | jq -cs '{dir: .}')" >> "$GITHUB_OUTPUT"
+      - name: Build matrix
+        id: mk
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # tj-actions outputs JSON array (because json=true, escape_json=false).
+            dirs='${{ steps.changed.outputs.all_changed_files }}'
+          else
+            dirs='${{ steps.all.outputs.dirs }}'
+          fi
+          echo "matrix=$(jq -nc --argjson d "$dirs" '{dir: $d}')" >> "$GITHUB_OUTPUT"
 
   build:
     needs: discover
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.discover.outputs.dirs) }}
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v6
       - name: Build package
