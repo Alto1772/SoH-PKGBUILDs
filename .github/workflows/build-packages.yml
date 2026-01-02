@@ -3,9 +3,9 @@ on:
   push:
     branches: [ main ]
     paths-ignore:
-    - .github/**
-    - *-git/**
-    - *-otr-*/**
+    - '.github/**'
+    - '*-git/**'
+    - '*-otr-*/**'
   workflow_dispatch:
 
 jobs:
