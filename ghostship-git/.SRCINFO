@@ -1,6 +1,6 @@
 pkgbase = ghostship-git
 	pkgdesc = A yet another definitive port of Super Mario 64 coming out of Harbour Masters
-	pkgver = 1.0.0.r14.gdf7e9119
+	pkgver = 1.0.1.r0.g4d1ec3a2
 	pkgrel = 1
 	url = https://github.com/HarbourMasters/Ghostship
 	install = ghostship.install
@@ -25,11 +25,13 @@ pkgbase = ghostship-git
 	source = git+https://github.com/HarbourMasters/Torch.git
 	source = git+https://github.com/Kenix3/libultraship.git
 	source = git+https://github.com/mdqinc/SDL_GameControllerDB.git
+	source = ghostship-fix-mtxf_copy-incorrect-values.patch
 	source = ghostship.desktop
 	sha256sums = SKIP
 	sha256sums = SKIP
 	sha256sums = SKIP
 	sha256sums = SKIP
+	sha256sums = 938879042af21330e36476fb88cd383e85c1b7e19d95cb74957fd1266ef83854
 	sha256sums = 230c28306ca1bd47976d3fb69d2cb50078b59e7ead713f187d804cd009b870e8
 
 pkgname = ghostship-git
